@@ -5,6 +5,7 @@ import prisma from "../config/prisma";
 
 export const register = async (req: Request, res: Response) => {
   try {
+    console.log(req.body);
     const { email, password } = req.body;
 
     const existingUser = await prisma.user.findUnique({
