@@ -59,14 +59,29 @@ export default function Dashboard() {
       </button>
 
       {result && (
-        <div>
-          <h2>Analysis</h2>
-          <p>{result.analysis}</p>
+  <div style={{ marginTop: "30px" }}>
+    <div
+      style={{
+        border: "1px solid gray",
+        padding: "20px",
+        marginBottom: "20px",
+      }}
+    >
+      <h2>Resume Analysis</h2>
+      <p>{result.analysis}</p>
+    </div>
 
-          <h2>Roadmap</h2>
-          <pre>{result.roadmap}</pre>
-        </div>
-      )}
+    <div
+      style={{
+        border: "1px solid gray",
+        padding: "20px",
+      }}
+    >
+      <h2>Career Roadmap</h2>
+      <pre>{result.roadmap}</pre>
+    </div>
+  </div>
+)}
     </main>
   );
 }
