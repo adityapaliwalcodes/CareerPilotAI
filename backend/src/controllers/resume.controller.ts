@@ -27,23 +27,24 @@ export const createResume = async (
   }
 };
 
-export const getUserResumes = async (
-  req: Request,
-  res: Response
-) => {
+export const getUserResumes = async (req, res) => {
   try {
+    console.log("GET USER RESUMES HIT");
     const { userId } = req.params;
-
+    console.log("USER ID:", userId);
     const resumes = await prisma.resume.findMany({
       where: {
         userId,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
-
-    res.json(resumes);
-  } catch {
+    console.log("RESUMES:", resumes);
+    res.status(200).json(resumes);
+  } catch (error) {
     res.status(500).json({
-      message: "Internal Server Error",
+      message: "Failed to fetch resumes",
     });
   }
 };

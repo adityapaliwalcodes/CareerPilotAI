@@ -9,25 +9,30 @@ export default function Dashboard() {
   const [result, setResult] = useState<any>(null);
 
   const createResume = async () => {
-    const resume = await axios.post(
-      "http://127.0.0.1:5000/resume",
-      {
-        title,
-        content,
-        userId: "cmpw7yp820000f8hcyqf2jchf",
-      }
-    );
+    try {
+      const resume = await axios.post(
+        "http://127.0.0.1:5000/resume",
+        {
+          title,
+          content,
+          userId: "cmpw7yp820000f8hcyqf2jchf",
+        }
+      );
 
-    const analysis = await axios.post(
-      `http://127.0.0.1:5000/resume/analyze/${resume.data.id}`
-    );
+      const analysis = await axios.post(
+        `http://127.0.0.1:5000/resume/analyze/${resume.data.id}`
+      );
 
-    setResult(analysis.data);
+      setResult(analysis.data);
+    } catch (error) {
+      console.error(error);
+      alert("Error");
+    }
   };
 
   return (
     <main style={{ padding: "40px" }}>
-      <h1>CareerPilot Dashboard</h1>
+      <h1>CareerPilot AI</h1>
 
       <input
         placeholder="Resume Title"
@@ -35,26 +40,32 @@ export default function Dashboard() {
         onChange={(e) => setTitle(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <textarea
+        rows={10}
+        cols={60}
         placeholder="Resume Content"
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        rows={10}
-        cols={50}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <button onClick={createResume}>
         Analyze Resume
       </button>
 
       {result && (
-        <pre>
-          {JSON.stringify(result, null, 2)}
-        </pre>
+        <div>
+          <h2>Analysis</h2>
+          <p>{result.analysis}</p>
+
+          <h2>Roadmap</h2>
+          <pre>{result.roadmap}</pre>
+        </div>
       )}
     </main>
   );
