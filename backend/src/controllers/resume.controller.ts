@@ -1,6 +1,6 @@
-import { analyzeResume } from "../services/ai.service";
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
+import { analyzeResume } from "../services/ai.service";
 
 export const createResume = async (
   req: Request,
@@ -14,24 +14,29 @@ export const createResume = async (
         title,
         content,
         userId,
-        analysis: "Analysis Pending",
-        roadmap: "Roadmap Pending",
+        analysis: {},
+        roadmap: {},
+        
       },
     });
 
-    res.status(201).json(resume);
-  } catch {
-    res.status(500).json({
+    return res.status(201).json(resume);
+  } catch (error) {
+    console.error("CREATE RESUME ERROR:", error);
+
+    return res.status(500).json({
       message: "Internal Server Error",
     });
   }
 };
 
-export const getUserResumes = async (req, res) => {
+export const getUserResumes = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    console.log("GET USER RESUMES HIT");
     const { userId } = req.params;
-    console.log("USER ID:", userId);
+
     const resumes = await prisma.resume.findMany({
       where: {
         userId,
@@ -40,20 +45,25 @@ export const getUserResumes = async (req, res) => {
         createdAt: "desc",
       },
     });
-    console.log("RESUMES:", resumes);
-    res.status(200).json(resumes);
+
+    return res.status(200).json(resumes);
   } catch (error) {
-    res.status(500).json({
+    console.error("GET RESUMES ERROR:", error);
+
+    return res.status(500).json({
       message: "Failed to fetch resumes",
     });
   }
 };
+
 export const analyzeResumeController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const { resumeId } = req.params;
+    console.log("=== ANALYZE CONTROLLER HIT ===");
+
+    const resumeId = String(req.params.resumeId);
 
     const resume = await prisma.resume.findUnique({
       where: {
@@ -67,25 +77,31 @@ export const analyzeResumeController = async (
       });
     }
 
+    console.log("Calling Gemini...");
+
     const result = await analyzeResume(
       resume.content
     );
 
-    const updatedResume =
-      await prisma.resume.update({
-        where: {
-          id: resumeId,
-        },
-        data: {
-          analysis: result.analysis,
-          roadmap: result.roadmap,
-        },
-      });
+    console.log("Gemini Result:", result);
 
-    res.json(updatedResume);
-  } catch {
-    res.status(500).json({
-      message: "Internal Server Error",
+    const updatedResume = await prisma.resume.update({
+      where: {
+        id: resumeId,
+      },
+      data: {
+        analysis: result.analysis,
+        roadmap: result.roadmap,
+      },
+    });
+
+    return res.json(updatedResume);
+  } catch (error: any) {
+    console.error("ANALYZE ERROR:", error);
+
+    return res.status(500).json({
+      message: error.message,
+      error,
     });
   }
 };

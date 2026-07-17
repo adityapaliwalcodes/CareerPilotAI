@@ -18,8 +18,8 @@ model Resume {
   id          String   @id @default(cuid())
   title       String
   content     String
-  analysis    String?
-  roadmap     String?
+  analysis    Json?
+  roadmap     Json?
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())

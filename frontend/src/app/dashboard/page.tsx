@@ -22,7 +22,10 @@ export default function Dashboard() {
       const analysis = await axios.post(
         `http://127.0.0.1:5000/resume/analyze/${resume.data.id}`
       );
-
+      console.log(
+        "AI RESPONSE:",
+        JSON.stringify(analysis.data, null, 2)
+      );
       setResult(analysis.data);
     } catch (error) {
       console.error(error);
@@ -68,7 +71,30 @@ export default function Dashboard() {
       }}
     >
       <h2>Resume Analysis</h2>
-      <p>{result.analysis}</p>
+
+      {typeof result.analysis === "string" ? (
+        <p>{result.analysis}</p>
+      ) : (
+        <>
+          <h3>Strengths</h3>
+          <ul>
+            {result.analysis.strengths?.map(
+              (item: string, index: number) => (
+                <li key={index}>{item}</li>
+              )
+            )}
+          </ul>
+
+          <h3>Weaknesses</h3>
+          <ul>
+            {result.analysis.weaknesses?.map(
+              (item: string, index: number) => (
+                <li key={index}>{item}</li>
+              )
+            )}
+          </ul>
+        </>
+      )}
     </div>
 
     <div
@@ -78,10 +104,33 @@ export default function Dashboard() {
       }}
     >
       <h2>Career Roadmap</h2>
-      <pre>{result.roadmap}</pre>
+
+      {typeof result.roadmap === "string" ? (
+        <p>{result.roadmap}</p>
+      ) : (
+        <>
+          <h3>Short Term</h3>
+          <ul>
+            {result.roadmap.shortTerm?.map(
+              (item: string, index: number) => (
+                <li key={index}>{item}</li>
+              )
+            )}
+          </ul>
+
+          <h3>Long Term</h3>
+          <ul>
+            {result.roadmap.longTerm?.map(
+              (item: string, index: number) => (
+                <li key={index}>{item}</li>
+              )
+            )}
+          </ul>
+        </>
+      )}
     </div>
   </div>
-)}
+)}     
     </main>
   );
 }
